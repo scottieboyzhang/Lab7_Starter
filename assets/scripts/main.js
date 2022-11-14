@@ -45,6 +45,15 @@ function initializeServiceWorker() {
   // We first must register our ServiceWorker here before any of the code in
   // sw.js is executed.
   // B1. TODO - Check if 'serviceWorker' is supported in the current browser
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load',async()=>{
+    try{
+      let r = await navigator.serviceWorker.register('./sw.js')
+      console.log('Registration succeeded.' + r.scope);
+    }catch(error){
+      // registration failed
+      console.log('Registration failed with ' + error);
+    } 
   // B2. TODO - Listen for the 'load' event on the window object.
   // Steps B3-B6 will be *inside* the event listener's function created in B2
   // B3. TODO - Register './sw.js' as a service worker (The MDN article
@@ -54,6 +63,8 @@ function initializeServiceWorker() {
   // B5. TODO - In the event that the service worker registration fails, console
   //            log that it has failed.
   // STEPS B6 ONWARDS WILL BE IN /sw.js
+    })
+  }
 }
 
 /**
@@ -68,7 +79,7 @@ async function getRecipes() {
   // EXPOSE - START (All expose numbers start with A)
   // A1. TODO - Check local storage to see if there are any recipes.
   //            If there are recipes, return them.
-  if(localStorage.getItem('recipes')!= []){return JSON.parse(localStorage.getItem('recipes'));}
+  if(localStorage.getItem('recipes')){return JSON.parse(localStorage.getItem('recipes'));}
   /**************************/
   // The rest of this method will be concerned with requesting the recipes
   // from the network
@@ -80,8 +91,8 @@ async function getRecipes() {
   //            you can call to either resolve the Promise or Reject it.
   let recipes =[]
   let p = new Promise(async(resolve,reject) =>{
-    for(let i=0; i<RECIPE_URLS.length;++i){
-      try{
+    for(let i=0; i<RECIPE_URLS.length;++i){//A4
+      try{//A5
         const url = await fetch(RECIPE_URLS[i]); //A6
         const json = await url.json(); //A7
         recipes.push(json); //A8
@@ -90,8 +101,8 @@ async function getRecipes() {
           resolve(recipes);
         }
       }catch(err){
-          console.error("Error happening!");
-          reject(err);
+          console.error("Error happening!");//A10
+          reject(err);//A11
       }
     }
   })
